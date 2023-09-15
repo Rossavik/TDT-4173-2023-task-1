@@ -1,14 +1,19 @@
 import numpy as np 
 import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns 
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
 # (math, random, collections, functools, etc. are perfectly fine)
 
 
 class LogisticRegression:
     
-    def __init__():
+    def __init__(self, learning_rate=0.01, num_iterations=1000):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
+        self.learning_rate = learning_rate
+        self.num_iterations = num_iterations
+        self.theta = None
         pass
         
     def fit(self, X, y):
@@ -22,7 +27,21 @@ class LogisticRegression:
                 m binary 0.0/1.0 labels
         """
         # TODO: Implement
-        raise NotImplemented()
+        
+        m, n = X.shape  # m: number of samples, n: number of features
+        self.theta = np.zeros(n)  # Initialize model parameters
+    
+        for _ in range(self.num_iterations):
+            # Calculate the predictions using the current parameters
+            predictions = self.predict(X)
+
+            # Compute the gradient of the cost function
+            gradient = np.dot(X.T, (predictions - y)) / m
+
+            # Update the parameters using gradient descent
+            self.theta -= self.learning_rate * gradient
+        
+        #raise NotImplemented()
     
     def predict(self, X):
         """
@@ -39,7 +58,17 @@ class LogisticRegression:
             with probability-like predictions
         """
         # TODO: Implement
-        raise NotImplemented()
+
+    # Ensure that the model has been fitted before making predictions
+        if self.theta is None:
+            raise ValueError("Model has not been trained yet. Call fit() first.")
+
+        # Calculate the probability of the positive class (class 1)
+        probabilities = sigmoid(np.dot(X, self.theta))
+
+        return probabilities
+        
+        #raise NotImplemented()
         
 
         

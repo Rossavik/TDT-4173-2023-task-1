@@ -1,14 +1,20 @@
 import numpy as np 
-import pandas as pd 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
 # (math, random, collections, functools, etc. are perfectly fine)
 
 
 class KMeans:
     
-    def __init__():
+    def __init__(self, n_clusters, max_iters=100, random_state=None):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
+        self.n_clusters = n_clusters
+        self.max_iters = max_iters
+        self.random_state = random_state
+        self.centroids = None
         pass
         
     def fit(self, X):
@@ -20,7 +26,28 @@ class KMeans:
                 m rows (#samples) and n columns (#features)
         """
         # TODO: Implement
-        raise NotImplemented()
+        
+        np.random.seed(self.random_state)
+        n_samples, n_features = X.shape
+
+        # Randomly initialize centroids from the data points
+        random_indices = np.random.choice(n_samples, self.n_clusters, replace=False)
+        self.centroids = X[random_indices]
+
+        for _ in range(self.max_iters):
+            # Assign each data point to the nearest centroid
+            labels = self.predict(X)
+
+            # Update centroids as the mean of data points in each cluster
+            new_centroids = np.array([X[labels == i].mean(axis=0) for i in range(self.n_clusters)])
+
+            # Check for convergence
+            if np.allclose(self.centroids, new_centroids, rtol=1e-4):
+                break
+
+            self.centroids = new_centroids
+        
+        #raise NotImplemented()
     
     def predict(self, X):
         """
@@ -39,7 +66,12 @@ class KMeans:
             could be: array([2, 0, 0, 1, 2, 1, 1, 0, 2, 2])
         """
         # TODO: Implement 
-        raise NotImplemented()
+        
+        distances = self.cross_euclidean_distance(X, self.centroids)
+        labels = np.argmin(distances, axis=1)
+        return labels
+        
+        #raise NotImplemented()
     
     def get_centroids(self):
         """
@@ -56,10 +88,23 @@ class KMeans:
             [xm_1, xm_2, ..., xm_n]
         ])
         """
+        return self.centroids
         pass
     
     
-    
+    def plot_clusters(X, labels, centroids):
+        """
+        Visualize the clusters and centroids.
+
+        Parameters:
+        X (array-like): Input data of shape (n_samples, n_features).
+        labels (array-like): Cluster labels for each data point.
+        centroids (array-like): Cluster centroids.
+        """
+        sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=labels, palette="Set1")
+        sns.scatterplot(x=centroids[:, 0], y=centroids[:, 1], color='black', marker='x', s=100, label='Centroids')
+        plt.legend()
+        plt.show()
     
 # --- Some utility functions 
 
@@ -154,4 +199,3 @@ def euclidean_silhouette(X, z):
     b = (D + inf_mask).min(axis=1)
     
     return np.mean((b - a) / np.maximum(a, b))
-  
