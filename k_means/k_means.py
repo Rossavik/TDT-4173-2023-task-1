@@ -29,24 +29,14 @@ class KMeans:
         
         np.random.seed(self.random_state)
         n_samples, n_features = X.shape
-
-        # Randomly initialize centroids from the data points
         random_indices = np.random.choice(n_samples, self.n_clusters, replace=False)
         self.centroids = X[random_indices]
-
         for _ in range(self.max_iters):
-            # Assign each data point to the nearest centroid
             labels = self.predict(X)
-
-            # Update centroids as the mean of data points in each cluster
             new_centroids = np.array([X[labels == i].mean(axis=0) for i in range(self.n_clusters)])
-
-            # Check for convergence
             if np.allclose(self.centroids, new_centroids, rtol=1e-4):
                 break
-
             self.centroids = new_centroids
-        
         #raise NotImplemented()
     
     def predict(self, X):
@@ -66,11 +56,9 @@ class KMeans:
             could be: array([2, 0, 0, 1, 2, 1, 1, 0, 2, 2])
         """
         # TODO: Implement 
-        
         distances = self.cross_euclidean_distance(X, self.centroids)
         labels = np.argmin(distances, axis=1)
         return labels
-        
         #raise NotImplemented()
     
     def get_centroids(self):
